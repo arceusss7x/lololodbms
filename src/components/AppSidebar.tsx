@@ -1,5 +1,6 @@
-import { Home, Users, Package, Warehouse, Calendar, FileText } from "lucide-react";
+import { Home, Users, Package, Warehouse, Calendar, FileText, LayoutDashboard } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import logo from "@/assets/logo.png";
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +13,8 @@ import {
 } from "@/components/ui/sidebar";
 
 const menuItems = [
-  { title: "Dashboard", url: "/", icon: Home },
+  { title: "Home", url: "/", icon: Home },
+  { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
   { title: "Donors", url: "/donors", icon: Users },
   { title: "Food Items", url: "/food-items", icon: Package },
   { title: "Storage", url: "/storage", icon: Warehouse },
@@ -24,8 +26,9 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
-        <div className="p-4">
-          <h2 className="text-lg font-bold text-sidebar-foreground">Food Bank</h2>
+        <div className="p-4 flex items-center gap-3">
+          <img src={logo} alt="Project Nourish Logo" className="w-10 h-10" />
+          <h2 className="text-lg font-bold text-sidebar-foreground">Project Nourish</h2>
         </div>
         <SidebarGroup>
           <SidebarGroupLabel>Management</SidebarGroupLabel>
