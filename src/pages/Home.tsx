@@ -1,10 +1,38 @@
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import logo from "@/assets/logo.png";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Package, Users, Warehouse, Calendar } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 export default function Home() {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if user is already logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        // Fetch user role to redirect appropriately
+        supabase
+          .from("user_roles")
+          .select("role")
+          .eq("user_id", session.user.id)
+          .single()
+          .then(({ data }) => {
+            if (data?.role === "admin") {
+              navigate("/admin-dashboard");
+            } else if (data?.role === "donor") {
+              navigate("/donor-dashboard");
+            } else {
+              navigate("/dashboard");
+            }
+          });
+      }
+    });
+  }, [navigate]);
+
   return (
     <div className="space-y-8">
       {/* Hero Section */}
@@ -12,9 +40,14 @@ export default function Home() {
         <img src={logo} alt="Project Nourish Logo" className="w-32 h-32" />
         <div>
           <h1 className="text-5xl font-bold text-foreground mb-3">Project Nourish</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl">
+          <p className="text-xl text-muted-foreground max-w-2xl mb-6">
             Empowering communities through efficient food bank management and distribution
           </p>
+          <Link to="/auth">
+            <Button size="lg" className="text-lg px-8">
+              Login / Sign Up
+            </Button>
+          </Link>
         </div>
       </div>
 

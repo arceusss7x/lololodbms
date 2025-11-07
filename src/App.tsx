@@ -4,8 +4,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/Home";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
+import DonorDashboard from "./pages/DonorDashboard";
+import AdminDashboard from "./pages/AdminDashboard";
 import Donors from "./pages/Donors";
 import FoodItems from "./pages/FoodItems";
 import Storage from "./pages/Storage";
@@ -21,19 +25,92 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Layout>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/donors" element={<Donors />} />
-            <Route path="/food-items" element={<FoodItems />} />
-            <Route path="/storage" element={<Storage />} />
-            <Route path="/distribution-events" element={<DistributionEvents />} />
-            <Route path="/distribution-details" element={<DistributionDetails />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Layout>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Dashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/donor-dashboard"
+            element={
+              <ProtectedRoute requiredRole="donor">
+                <Layout>
+                  <DonorDashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <Layout>
+                  <AdminDashboard />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/donors"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Donors />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/food-items"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <FoodItems />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/storage"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <Storage />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/distribution-events"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <DistributionEvents />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/distribution-details"
+            element={
+              <ProtectedRoute>
+                <Layout>
+                  <DistributionDetails />
+                </Layout>
+              </ProtectedRoute>
+            }
+          />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
