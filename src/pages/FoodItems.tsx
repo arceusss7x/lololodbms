@@ -22,7 +22,7 @@ export default function FoodItems() {
       const { data, error } = await supabase
         .from("food_items")
         .select("*, donors(donor_name)")
-        .order("donated_date", { ascending: false });
+        .order("donation_date", { ascending: false });
       
       if (error) {
         toast({
@@ -83,7 +83,7 @@ export default function FoodItems() {
                     <TableCell>{item.quantity}</TableCell>
                     <TableCell>{item.unit}</TableCell>
                     <TableCell>{item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : "N/A"}</TableCell>
-                    <TableCell>{new Date(item.donated_date).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(item.donation_date).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon">
                         <Edit className="h-4 w-4" />
