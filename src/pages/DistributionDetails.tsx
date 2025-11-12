@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Plus, Edit, Trash2 } from "lucide-react";
@@ -10,15 +10,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export default function DistributionDetails() {
-  const [details] = useState([
-    { event_id: 1, item_id: 1, event_name: "Community Center", item_name: "Canned Beans", distributed_quantity: 15 },
-    { event_id: 1, item_id: 2, event_name: "Community Center", item_name: "Rice", distributed_quantity: 20 },
-    { event_id: 2, item_id: 3, event_name: "Church Hall", item_name: "Pasta", distributed_quantity: 15 },
-    { event_id: 3, item_id: 4, event_name: "School Gymnasium", item_name: "Fresh Apples", distributed_quantity: 50 },
-    { event_id: 4, item_id: 1, event_name: "Downtown Park", item_name: "Canned Beans", distributed_quantity: 10 },
-  ]);
+  const { toast } = useToast();
+  
+  const { data: details = [], isLoading } = useQuery({
+    queryKey: ["distribution_details"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("distribution_details")
+        .select(`
+          *,
+          distribution_events(event_date, location),
+          food_items(item_name)
+        `)
+        .order("created_at", { ascending: false });
+      
+      if (error) {
+        toast({
+          title: "Error",
+          description: "Failed to load distribution details",
+          variant: "destructive",
+        });
+        throw error;
+      }
+      return data || [];
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -41,32 +61,40 @@ export default function DistributionDetails() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Event ID</TableHead>
-                <TableHead>Item ID</TableHead>
-                <TableHead>Event Name</TableHead>
+                <TableHead>Event Date</TableHead>
+                <TableHead>Event Location</TableHead>
                 <TableHead>Item Name</TableHead>
-                <TableHead>Distributed Quantity</TableHead>
+                <TableHead>Quantity Distributed</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {details.map((detail, index) => (
-                <TableRow key={`${detail.event_id}-${detail.item_id}-${index}`}>
-                  <TableCell>{detail.event_id}</TableCell>
-                  <TableCell>{detail.item_id}</TableCell>
-                  <TableCell className="font-medium">{detail.event_name}</TableCell>
-                  <TableCell>{detail.item_name}</TableCell>
-                  <TableCell>{detail.distributed_quantity}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+              {isLoading ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">Loading...</TableCell>
                 </TableRow>
-              ))}
+              ) : details.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">No distribution details found</TableCell>
+                </TableRow>
+              ) : (
+                details.map((detail) => (
+                  <TableRow key={detail.detail_id}>
+                    <TableCell>{detail.distribution_events?.event_date ? new Date(detail.distribution_events.event_date).toLocaleDateString() : "N/A"}</TableCell>
+                    <TableCell className="font-medium">{detail.distribution_events?.location || "Unknown"}</TableCell>
+                    <TableCell>{detail.food_items?.item_name || "Unknown"}</TableCell>
+                    <TableCell>{detail.quantity_distributed}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon">
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
             </TableBody>
           </Table>
         </CardContent>
