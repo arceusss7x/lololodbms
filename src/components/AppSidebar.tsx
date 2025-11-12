@@ -18,9 +18,9 @@ const adminMenuItems = [
   { title: "Home", url: "/", icon: Home },
   { title: "Admin Dashboard", url: "/admin-dashboard", icon: LayoutDashboard },
   { title: "Dashboard", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Donors", url: "/donors", icon: Users },
-  { title: "Food Items", url: "/food-items", icon: Package },
-  { title: "Storage", url: "/storage", icon: Warehouse },
+  { title: "Manage Donors", url: "/donors", icon: Users },
+  { title: "Food Inventory", url: "/food-items", icon: Package },
+  { title: "Storage Facilities", url: "/storage", icon: Warehouse },
   { title: "Distribution Events", url: "/distribution-events", icon: Calendar },
   { title: "Distribution Details", url: "/distribution-details", icon: FileText },
 ];
